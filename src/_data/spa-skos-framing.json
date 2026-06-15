@@ -1,0 +1,104 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "graph": "@graph",
+    "included": "@included",
+
+
+    "crm": "http://www.cidoc-crm.org/cidoc-crm/",
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "spav": "http://vocab.performing-arts.ch/",    
+    "xsd": "http://www.w3.org/2001/XMLSchema#",    
+
+
+    "ConceptScheme": "skos:ConceptScheme",
+    "Concept": "skos:Concept",
+
+
+    "inverse_inScheme" : {
+      "@reverse" : "skos:inScheme"
+    },
+    "prefLabel":{ 
+      "@id" : "skos:prefLabel",
+      "@container" : "@set"
+    },
+    "altLabel": {
+      "@id" : "skos:altLabel",
+      "@container" : "@set"
+    },
+    "narrower" : {
+      "@id" : "skos:narrower",
+      "@container" : "@set"
+    },
+    "subject" : "dct:subject",
+    "notation": "skos:notation",
+    "broader": "skos:broader",
+    "definition": { 
+      "@id" : "skos:definition",
+      "@container" : "@set"
+    },
+    "exactMatch": { 
+      "@id" : "skos:exactMatch",
+      "@container" : "@set"
+    }
+  },
+
+  "@explicit" : true,
+  "type" : "ConceptScheme",
+  "subject" : {
+    "@explicit" : true
+  },
+  "prefLabel" : {},
+  "definition" : {
+    "@omitDefault": true
+  },
+  "notation": {},
+  "inverse_inScheme" : {
+    "@explicit" : true,
+    "prefLabel": {},
+    "notation" : {},
+    "altLabel" : {
+      "@omitDefault": true
+    },
+    "definition" : {
+      "@omitDefault": true
+    },    
+    "exactMatch" : {
+      "@omitDefault": true
+    },
+    "broader":{
+      "@omitDefault": true,
+      "@embed" : "@always",
+      "prefLabel" : {},
+      "@explicit" : true,
+      "broader":{
+        "@omitDefault": true,
+        "@embed" : "@always",
+        "prefLabel" : {},
+        "@explicit" : true,
+        "broader":{
+          "@omitDefault": true,
+          "@embed" : "@always",
+          "prefLabel" : {},
+          "@explicit" : true,
+          "broader":{
+            "@omitDefault": true,
+            "@embed" : "@always",
+            "prefLabel" : {},
+            "@explicit" : true
+          }
+        }
+      }
+    },
+    "narrower":{
+      "@omitDefault": true,
+      "@embed" : "@always",
+      "prefLabel" : {},
+      "@explicit" : true
+    }
+  }   
+}

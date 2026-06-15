@@ -1,0 +1,58 @@
+name: PageWeb Sapa Vocabularies
+on:
+  workflow_dispatch:
+
+jobs:
+  build_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies & build
+        run: |
+          npm ci
+
+      - name: Persist npm cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package.json') }}
+
+      - name: Persist Eleventy .cache
+        uses: actions/cache@v3
+        with:
+          path: ./.cache
+          key: ${{ runner.os }}-eleventy-fetch-cache
+
+      - name: Create dir
+        run: |
+          mkdir dist
+      - run: npm run build
+        working-directory: dist
+
+      # Send files to server
+      - name: Send files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          port: ${{ secrets.PORT }}
+          key: ${{ secrets.KEY }}
+          source: "dist/"
+          target: ${{ secrets.REMOTE_PATH_USER }}
+          rm: true
+          strip_components: 1
+
+      - name: Copy Files
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            #!/bin/bash
+            sh ${{ secrets.SCRIPT_SH }}

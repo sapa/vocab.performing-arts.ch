@@ -1,0 +1,53 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+    "graph": "@graph",
+    "included": "@included",
+    "dct": "http://purl.org/dc/terms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "spav": "http://vocab.performing-arts.ch/",
+
+
+    "ConceptScheme": "skos:ConceptScheme",
+    "Concept": "skos:Concept",
+    
+    "skos:broader": { "@type":"@id"},
+    "skos:inScheme": { "@type":"@id"},
+    "skos:narrower": { "@type":"@id"},
+    "prefLabel": "skos:prefLabel", 
+    
+    "subjectOf": {
+      "@reverse":"dct:subject",
+      "@container" : "@set"
+    }
+    
+  },
+
+  "@requireAll" : true,
+  "type" : "Concept",
+  "skos:topConceptOf" : {
+    "@id" : "spav:vs"
+  },
+  "skos:inScheme": {
+    "@embed": "@never"
+  },
+  "subjectOf":{
+      "@explicit":true,
+      "prefLabel":{}
+  },
+  "skos:narrower":{
+    "@requireAll" : false,
+    "skos:inScheme": {
+      "@embed": "@never"
+    },
+    "subjectOf":{
+      "@explicit":true,
+      "@embed": "@always",
+      "prefLabel":{}
+    }
+  }
+}
