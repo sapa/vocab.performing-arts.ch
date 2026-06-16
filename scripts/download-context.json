@@ -1,0 +1,30 @@
+{
+  "@context": {
+    "id": "@id",
+    "type": "@type",
+
+    "dct": "http://purl.org/dc/terms/",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "spav": "http://vocab.performing-arts.ch/",
+    "spao": "http://ontology.performing-arts.ch/",
+    "rico": "https://www.ica.org/standards/RiC/ontology#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+
+    "ConceptScheme": "skos:ConceptScheme",
+    "Concept": "skos:Concept",
+
+    "prefLabel": { "@id": "skos:prefLabel", "@container": "@set" },
+    "altLabel": { "@id": "skos:altLabel", "@container": "@set" },
+    "definition": { "@id": "skos:definition", "@container": "@set" },
+    "notation": "skos:notation",
+    "inScheme": { "@id": "skos:inScheme", "@type": "@id" },
+    "broader": { "@id": "skos:broader", "@type": "@id" },
+    "narrower": { "@id": "skos:narrower", "@type": "@id" },
+    "topConceptOf": { "@id": "skos:topConceptOf", "@type": "@id" },
+    "hasTopConcept": { "@id": "skos:hasTopConcept", "@type": "@id" },
+    "exactMatch": { "@id": "skos:exactMatch", "@type": "@id" },
+    "subject": { "@id": "dct:subject", "@type": "@id" }
+  }
+}
