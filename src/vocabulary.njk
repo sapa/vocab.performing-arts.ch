@@ -28,8 +28,8 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
           <i class="fa-solid fa-download"></i>&nbsp;Download
         </button>
         <ul class="dropdown-menu" aria-labelledby="downloadDropdown_{{ vocabSlug }}">
-          <li><a class="dropdown-item" href="/downloads/{{ vocabSlug }}.ttl" download>Turtle (.ttl)</a></li>
-          <li><a class="dropdown-item" href="/downloads/{{ vocabSlug }}.jsonld" download>JSON-LD (.jsonld)</a></li>
+          <li><a class="dropdown-item" href="{{ ('/downloads/' + vocabSlug + '.ttl') | relative(page) }}" download>Turtle (.ttl)</a></li>
+          <li><a class="dropdown-item" href="{{ ('/downloads/' + vocabSlug + '.jsonld') | relative(page) }}" download>JSON-LD (.jsonld)</a></li>
         </ul>
       </div>
 

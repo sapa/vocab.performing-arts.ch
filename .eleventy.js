@@ -107,6 +107,24 @@ module.exports = function (eleventyConfig) {
     return value.split(':')[1]
   });
 
+  /**
+   * Turns an absolute URL into one relative to the current page.
+   * Usage : {{ "/downloads/ac.ttl" | relative(page) }}
+   **/
+  eleventyConfig.addFilter('relative', function (absoluteUrl, page) {
+    if (absoluteUrl.includes("://")) {
+      // full URI, return it directly
+      return absoluteUrl;
+    }
+    try {
+      var relativeUrl = require("path").relative(page.url, absoluteUrl);
+      const URLRelative = relativeUrl.replace(new RegExp(/\\/g), "/");
+      return URLRelative;
+    } catch (error) {
+      return absoluteUrl;
+    }
+  });
+
   // skos:exactMatch
   eleventyConfig.addShortcode("getexactMatch", async function(jsonData) {
 
