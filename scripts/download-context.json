@@ -15,16 +15,19 @@
     "ConceptScheme": "skos:ConceptScheme",
     "Concept": "skos:Concept",
 
-    "prefLabel": { "@id": "skos:prefLabel", "@container": "@set" },
-    "altLabel": { "@id": "skos:altLabel", "@container": "@set" },
-    "definition": { "@id": "skos:definition", "@container": "@set" },
-    "notation": "skos:notation",
-    "inScheme": { "@id": "skos:inScheme", "@type": "@id" },
-    "broader": { "@id": "skos:broader", "@type": "@id" },
-    "narrower": { "@id": "skos:narrower", "@type": "@id" },
-    "topConceptOf": { "@id": "skos:topConceptOf", "@type": "@id" },
-    "hasTopConcept": { "@id": "skos:hasTopConcept", "@type": "@id" },
-    "exactMatch": { "@id": "skos:exactMatch", "@type": "@id" },
-    "subject": { "@id": "dct:subject", "@type": "@id" }
+    "skos:prefLabel": { "@container": "@language" },
+    "skos:altLabel": { "@container": "@language" },
+    "skos:definition": { "@container": "@language" },
+    "skos:editorialNote": { "@container": "@language" },
+    "rico:name": { "@container": "@language" },
+    "skos:notation": {},
+    "skos:inScheme": { "@type": "@id" },
+    "skos:broader": { "@type": "@id" },
+    "skos:narrower": { "@type": "@id" },
+    "skos:topConceptOf": { "@type": "@id" },
+    "skos:hasTopConcept": { "@type": "@id" },
+    "skos:exactMatch": { "@type": "@id" },
+    "dct:subject": { "@type": "@id" },
+    "dct:coverage": { "@type": "@id" }
   }
 }
