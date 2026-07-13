@@ -30,8 +30,22 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
         <ul class="dropdown-menu" aria-labelledby="downloadDropdown_{{ vocabSlug }}">
           <li><a class="dropdown-item" href="{{ ('/downloads/' + vocabSlug + '.ttl') | relative(page) }}" download>Turtle (.ttl)</a></li>
           <li><a class="dropdown-item" href="{{ ('/downloads/' + vocabSlug + '.jsonld') | relative(page) }}" download>JSON-LD (.jsonld)</a></li>
+          <li><a class="dropdown-item" href="{{ ('/downloads/' + vocabSlug + '.csv') | relative(page) }}" download>CSV (.csv)</a></li>
         </ul>
       </div>
+
+      <!-- Usage chart (camembert, 1er niveau, données dans /stats/<slug>.json) -->
+      <section class="usage-stats mb-3" data-stats-url="{{ ('/stats/' + vocabSlug + '.json') | relative(page) }}">
+        <h6 class="usage-stats-title mb-2" style="display:none">Usage on performing-arts</h6>
+        <p class="usage-stats-hint text-muted small mb-2" style="display:none">Click a slice of the chart to see the entities using that concept.</p>
+        <div class="usage-stats-chart-wrap" style="display:none;position:relative;width:100%;max-width:820px;height:520px;">
+          <canvas class="usage-stats-canvas"></canvas>
+        </div>
+        <p class="usage-stats-empty text-muted fst-italic" style="display:none">No recorded usage on performing-arts.</p>
+        <p class="usage-stats-link" style="display:none">
+          <small><a class="usage-stats-query" href="#" target="_blank" rel="noopener">See the SPARQL query&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a></small>
+        </p>
+      </section>
 
       <br>
       <div class="container">
@@ -409,6 +423,101 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
 
   <!-- breadcrumb -->
   <script>
-    
-  </script> 
+
+  </script>
+
+  <!-- Usage chart (camembert du 1er niveau) -->
+  <script>
+  (function () {
+    const section = document.querySelector(".usage-stats");
+    if (!section || typeof Chart === "undefined") return;
+
+    const titleEl = section.querySelector(".usage-stats-title");
+    const hintEl = section.querySelector(".usage-stats-hint");
+    const chartWrap = section.querySelector(".usage-stats-chart-wrap");
+    const canvasEl = section.querySelector(".usage-stats-canvas");
+    const emptyEl = section.querySelector(".usage-stats-empty");
+    const linkWrap = section.querySelector(".usage-stats-link");
+    const queryLink = section.querySelector(".usage-stats-query");
+
+    const palette = [
+      "#083658", "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
+      "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#aec7e8",
+      "#ffbb78", "#98df8a", "#ff9896", "#c5b0d5",
+    ];
+
+    fetch(section.dataset.statsUrl)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((stats) => {
+        if (!stats) return;
+
+        titleEl.textContent = stats.title || "Usage on performing-arts";
+        titleEl.style.display = "";
+
+        if (stats.queryUrl) {
+          queryLink.href = stats.queryUrl;
+          linkWrap.style.display = "";
+        }
+
+        // On affiche TOUS les concepts utilisés sur un seul diagramme, sans tenir
+        // compte de la hiérarchie (chaque entrée de tree = un concept, usage direct).
+        const tree = stats.tree || [];
+        const slices = tree
+          .slice()
+          .sort((a, b) => b.count - a.count);
+
+        if (!slices.length) {
+          emptyEl.style.display = "";
+          return;
+        }
+
+        hintEl.style.display = "";
+        chartWrap.style.display = "";
+
+        // Légende cliquable EN DESSOUS du camembert (et non à droite) : avec 48
+        // concepts la légende de droite était trop étroite et les libellés se
+        // coupaient. En dessous, elle se répartit sur toute la largeur / plusieurs
+        // lignes et reste cliquable pour décocher les gros concepts et voir les petits.
+        chartWrap.style.height = "";
+        chartWrap.style.minHeight = "360px";
+
+        new Chart(canvasEl, {
+          type: "pie",
+          data: {
+            labels: slices.map((s) => s.label + " (" + s.count + ")"),
+            datasets: [{
+              data: slices.map((s) => s.count),
+              backgroundColor: slices.map((_, i) => palette[i % palette.length]),
+              borderWidth: 1,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { boxWidth: 12, font: { size: 11 }, padding: 8 },
+              },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => " " + slices[ctx.dataIndex].label + " : " + slices[ctx.dataIndex].count,
+                },
+              },
+            },
+            // Clic sur une part -> requête "Usage" QLever du concept.
+            onClick: (evt, elements) => {
+              if (!elements.length) return;
+              const s = slices[elements[0].index];
+              if (s && s.usageUrl) window.open(s.usageUrl, "_blank", "noopener");
+            },
+            onHover: (evt, elements) => {
+              evt.native.target.style.cursor = elements.length ? "pointer" : "default";
+            },
+          },
+        });
+      })
+      .catch(() => { /* stats absentes : on n'affiche rien */ });
+  })();
+  </script>
 </main>

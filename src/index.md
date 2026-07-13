@@ -21,6 +21,7 @@ layout: "main.njk"
     					<ul class="dropdown-menu" aria-labelledby="dl_{{ itemSlug }}">
     						<li><a class="dropdown-item" href="{{ ('/downloads/' + itemSlug + '.ttl') | relative(page) }}" download>Turtle (.ttl)</a></li>
     						<li><a class="dropdown-item" href="{{ ('/downloads/' + itemSlug + '.jsonld') | relative(page) }}" download>JSON-LD (.jsonld)</a></li>
+    						<li><a class="dropdown-item" href="{{ ('/downloads/' + itemSlug + '.csv') | relative(page) }}" download>CSV (.csv)</a></li>
     					</ul>
     				</span>
     			</li>
