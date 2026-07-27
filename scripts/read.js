@@ -79,7 +79,7 @@ SELECT ?concept ?notation ?broader
   (GROUP_CONCAT(DISTINCT ?ricIt; separator="${MULTI_SEP}") AS ?ricName_it)
   (GROUP_CONCAT(DISTINCT ?defEn; separator="${MULTI_SEP}") AS ?definition_en)
   (GROUP_CONCAT(DISTINCT ?edNote; separator="${MULTI_SEP}") AS ?editorialNote_en)
-  (GROUP_CONCAT(DISTINCT REPLACE(STR(?narrower), "^.*[#/]", ""); separator="${MULTI_SEP}") AS ?narrower)
+  (GROUP_CONCAT(DISTINCT ?narrowerNotation; separator="${MULTI_SEP}") AS ?narrower)
   (GROUP_CONCAT(DISTINCT ?match; separator="${MULTI_SEP}") AS ?exactMatch)
 WHERE {
   GRAPH <${GRAPH}> {
@@ -104,7 +104,10 @@ WHERE {
     OPTIONAL { ?concept ric:name ?ricIt . FILTER(LANG(?ricIt)="it") }
     OPTIONAL { ?concept skos:definition ?defEn . FILTER(LANG(?defEn)="en") }
     OPTIONAL { ?concept skos:editorialNote ?edNote . FILTER(LANG(?edNote)="en") }
-    OPTIONAL { ?concept skos:narrower ?narrower }
+    OPTIONAL {
+      ?concept skos:narrower ?narrowerConcept .
+      OPTIONAL { ?narrowerConcept skos:notation ?narrowerNotation }
+    }
     OPTIONAL { ?concept skos:exactMatch ?match }
   }
 }
@@ -115,6 +118,7 @@ ORDER BY ?notation`;
 const CSV_COLUMNS = [
   "uri",
   "notation",
+  "path_en",
   "prefLabel_en",
   "prefLabel_fr",
   "prefLabel_de",
@@ -130,8 +134,7 @@ const CSV_COLUMNS = [
   "ricName_it",
   "definition_en",
   "editorialNote_en",
-  "broader_notation",
-  "path_en",
+  "broader",
   "narrower",
   "exactMatch",
 ];
@@ -163,8 +166,9 @@ WHERE {
 LIMIT 1000`;
 
 // Construit un lien vers l'interface web QLever pour une requête donnée.
+// exec=true déclenche l'exécution immédiate de la requête à l'ouverture.
 const qleverUiLink = (query) =>
-  `${QLEVER_UI}?query=${encodeURIComponent(query)}`;
+  `${QLEVER_UI}?exec=true&query=${encodeURIComponent(query)}`;
 
 // Interroge le endpoint SPARQL, renvoie le corps brut (string).
 function sparql(query, acceptMime) {
@@ -278,31 +282,42 @@ function buildCsv(rows) {
     return chain.join(" > ");
   };
 
+  const records = rows.map((r) => ({
+    uri: r.concept,
+    notation: r.notation,
+    prefLabel_en: joinMulti(r.prefLabel_en),
+    prefLabel_fr: joinMulti(r.prefLabel_fr),
+    prefLabel_de: joinMulti(r.prefLabel_de),
+    prefLabel_it: joinMulti(r.prefLabel_it),
+    altLabel_en: joinMulti(r.altLabel_en),
+    altLabel_fr: joinMulti(r.altLabel_fr),
+    altLabel_de: joinMulti(r.altLabel_de),
+    altLabel_it: joinMulti(r.altLabel_it),
+    hiddenLabel: joinMulti(r.hiddenLabel),
+    ricName_en: joinMulti(r.ricName_en),
+    ricName_fr: joinMulti(r.ricName_fr),
+    ricName_de: joinMulti(r.ricName_de),
+    ricName_it: joinMulti(r.ricName_it),
+    definition_en: joinMulti(r.definition_en),
+    editorialNote_en: joinMulti(r.editorialNote_en),
+    broader_notation: r.broader_notation,
+    path_en: pathEn(r),
+    narrower: joinMulti(r.narrower),
+    exactMatch: joinMulti(r.exactMatch),
+  }));
+
+  // Tri : path_en (les lignes sans path_en d'abord), puis prefLabel_en.
+  records.sort((a, b) => {
+    if (a.path_en !== b.path_en) {
+      if (!a.path_en) return -1;
+      if (!b.path_en) return 1;
+      return a.path_en.localeCompare(b.path_en);
+    }
+    return a.prefLabel_en.localeCompare(b.prefLabel_en);
+  });
+
   const lines = [CSV_COLUMNS.map(csvEscape).join(",")];
-  for (const r of rows) {
-    const record = {
-      uri: r.concept,
-      notation: r.notation,
-      prefLabel_en: joinMulti(r.prefLabel_en),
-      prefLabel_fr: joinMulti(r.prefLabel_fr),
-      prefLabel_de: joinMulti(r.prefLabel_de),
-      prefLabel_it: joinMulti(r.prefLabel_it),
-      altLabel_en: joinMulti(r.altLabel_en),
-      altLabel_fr: joinMulti(r.altLabel_fr),
-      altLabel_de: joinMulti(r.altLabel_de),
-      altLabel_it: joinMulti(r.altLabel_it),
-      hiddenLabel: joinMulti(r.hiddenLabel),
-      ricName_en: joinMulti(r.ricName_en),
-      ricName_fr: joinMulti(r.ricName_fr),
-      ricName_de: joinMulti(r.ricName_de),
-      ricName_it: joinMulti(r.ricName_it),
-      definition_en: joinMulti(r.definition_en),
-      editorialNote_en: joinMulti(r.editorialNote_en),
-      broader_notation: r.broader_notation,
-      path_en: pathEn(r),
-      narrower: joinMulti(r.narrower),
-      exactMatch: joinMulti(r.exactMatch),
-    };
+  for (const record of records) {
     lines.push(CSV_COLUMNS.map((c) => csvEscape(record[c])).join(","));
   }
   // BOM UTF-8 pour un affichage correct des accents dans Excel.
@@ -328,7 +343,7 @@ function buildStats(sparqlJson, csUri) {
   });
 
   return {
-    title: "Usage on performing-arts",
+    title: "Usage on performing-arts.ch",
     queryUrl: qleverUiLink(queryUsageStats(csUri)),
     tree,
   };

@@ -37,7 +37,7 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
       <!-- Usage chart (camembert, 1er niveau, données dans /stats/<slug>.json) -->
       <section class="usage-stats mb-3" data-stats-url="{{ ('/stats/' + vocabSlug + '.json') | relative(page) }}">
         <h6 class="usage-stats-title mb-2" style="display:none">Usage on performing-arts</h6>
-        <p class="usage-stats-hint text-muted small mb-2" style="display:none">Click a slice of the chart to see the entities using that concept.</p>
+        <p class="usage-stats-hint text-muted small mb-2" style="display:none">Click a slice of the chart to see the entities using that concept.<br>Click on a legend item to hide the corresponding section of the diagram.</p>
         <div class="usage-stats-chart-wrap" style="display:none;position:relative;width:100%;max-width:820px;height:520px;">
           <canvas class="usage-stats-canvas"></canvas>
         </div>
