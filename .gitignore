@@ -6,3 +6,5 @@
 src/_data/vocabulary.ttl
 
 static/downloads/
+
+static/stats/

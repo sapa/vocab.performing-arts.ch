@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "clean": "rm -rf dist",
     "start": "eleventy --serve",
     "build": "npm run fetch && eleventy",
     "fetch": "node --max_old_space_size=8192 ./scripts/read.js"
