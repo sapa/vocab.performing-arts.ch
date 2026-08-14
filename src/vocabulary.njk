@@ -164,12 +164,26 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
                 <code>
                   <a href="{{ jsonScheme | expandURI(theConcept.id) }}">{{ jsonScheme | expandURI(theConcept.id) }}</a>
                 </code>
-                <br /> 
-                <!-- Sparql Query -->
-                <a href="{{ theConcept.id | getSparql }}" target="_blank" title="where is it used ?">Usage on performing-arts.ch&nbsp;<small><i class="fa-solid fa-arrow-up-right-from-square"></i></small></a>       
               </p>
             </div>
-          </div>  
+          </div>
+
+          <!-- Usage : comptage issu de static/stats/<vocab>.json (cf. src/_data/usage.js) -->
+          {% set usageCount = usage[theConcept.id | removePrefix] %}
+          <div class="row">
+            <div class="col-1">
+              <h6>Usage</h6>
+            </div>
+            <div class="col">
+              <p>
+                {%- if usageCount -%}
+                  Used <a href="{{ theConcept.id | getSparql }}" target="_blank" title="where is it used ?">{{ usageCount }} time{% if usageCount > 1 %}s{% endif %}</a> on performing-arts.ch.
+                {%- else -%}
+                  Not used on performing-arts.ch.
+                {%- endif -%}
+              </p>
+            </div>
+          </div>
 
           <!-- narrowers -->
           
