@@ -9,6 +9,9 @@ const { AssetCache } = require("@11ty/eleventy-fetch");
 const nunjucks = require("nunjucks");
 const EleventyBaseError = require("@11ty/eleventy/src/EleventyBaseError");
 
+// Interface web QLever : ?exec=true exécute la requête à l’ouverture de la page.
+const QLEVER_UI = "https://qlever-ui.performing-arts.ch/";
+
 AssetCache.concurrency = 4;
 
 module.exports = function (eleventyConfig) {
@@ -172,13 +175,42 @@ module.exports = function (eleventyConfig) {
    * Returns the SPARQL query corresponding to the given concept ID
    **/
   eleventyConfig.addFilter("getSparql", function (conceptId) {
-    const ENDPOINT = "https://qlever-ui.performing-arts.ch/";
     const conceptCode = conceptId.split(":")[1];
     var urlSparql =
-      ENDPOINT +
+      QLEVER_UI +
       `?exec=true&query=PREFIX+spav%3A+%3Chttp%3A%2F%2Fvocab.performing-arts.ch%2F%3E%0ASELECT+%3Fentity%0AWHERE+%7B%0A++%3Fentity+%3Fattribute+spav%3A${conceptCode}+.%0A++FILTER%28%21STRSTARTS%28STR%28%3Fentity%29%2C%22http%3A%2F%2Fvocab.performing-arts.ch%22%29%29%0A%7D%0ALIMIT+1000`;
     return urlSparql;
   });
+
+  /**
+   * Returns the SPARQL query counting the usage of a whole vocabulary,
+   * broken down by type of referencing entity and by property.
+   * Contrairement à la requête "per Concept" (stats.queryUrl, produite par
+   * scripts/read.js parce qu’elle alimente le camembert), celle-ci n’est jamais
+   * exécutée au build : elle ne dépend que de l’URI du ConceptScheme.
+   * Usage : {{ jsonScheme | getSparqlByTypeAndProperty(vocabulary.id) }}
+   **/
+  eleventyConfig.addFilter(
+    "getSparqlByTypeAndProperty",
+    function (inputContext, concept) {
+      const inputPrefix = concept.split(":")[0];
+      const inputConcept = concept.split(":")[1];
+      const csUri = JSON.parse(inputContext)[inputPrefix] + inputConcept;
+
+      const query = `PREFIX rico: <https://www.ica.org/standards/RiC/ontology#>
+PREFIX frbroo: <http://iflastandards.info/ns/fr/frbr/frbroo/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?type ?p (COUNT(?x) AS ?count)
+WHERE {
+  ?concept skos:inScheme <${csUri}> .
+  ?x ?p ?concept . FILTER(!STRSTARTS(STR(?p), "http://www.w3.org/2004/02/skos/core#"))
+  ?x a ?type .
+}
+GROUP BY ?type ?p`;
+
+      return `${QLEVER_UI}?exec=true&query=${encodeURIComponent(query)}`;
+    },
+  );
 
   // pass-through
   eleventyConfig.addPassthroughCopy({ static: "/" });

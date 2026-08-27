@@ -43,7 +43,11 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
         </div>
         <p class="usage-stats-empty text-muted fst-italic" style="display:none">No recorded usage on performing-arts.</p>
         <p class="usage-stats-link" style="display:none">
-          <small><a class="usage-stats-query" href="#" target="_blank" rel="noopener">See the SPARQL query&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a></small>
+          <small>
+            <a class="usage-stats-query" href="#" target="_blank" rel="noopener">Usage of this vocabulary per Concept&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a>
+            <span class="text-muted mx-1">|</span>
+            <a class="usage-stats-query-type" href="{{ jsonScheme | getSparqlByTypeAndProperty(vocabulary.id) }}" target="_blank" rel="noopener">Usage of this vocabulary per type and property&nbsp;<i class="fa-solid fa-arrow-up-right-from-square fa-xs"></i></a>
+          </small>
         </p>
       </section>
 
