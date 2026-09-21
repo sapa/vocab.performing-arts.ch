@@ -271,6 +271,26 @@ permalink: "vocabulary/{{ vocabulary.notation | slugify }}/"
     anchors.options.icon = '#';
     anchors.add('h5');
   </script>
+  <script>
+    // Keep the #anchor target at the top while the page is still growing above it,
+    // until the user scrolls or clicks.
+    (function () { // fonction lancée tout de suite, pour garder ses variables à part
+      // titre visé par l'adresse  "#skn" -> <h5 id="skn">
+      const target = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      // pas de #, terme inconnu ou navigateur trop ancien == on ne fait rien
+      if (!target || !window.ResizeObserver) return;
+      // capteur de taille : à chaque changement de la page, on redescend vers le titre
+      const observer = new ResizeObserver(() => target.scrollIntoView());
+      // débranche le capteur
+      const stop = () => observer.disconnect();
+      // surveille toute la page (l'arbre et le camembert la font grandir)
+      observer.observe(document.body);
+      // molette, doigt, clavier ou clic l'utilisateur prend la main on arrête
+      ["wheel", "touchstart", "keydown", "mousedown"].forEach((type) => window.addEventListener(type, stop, { once: true, passive: true }));
+      // dans tous les cas on arrête au bout de 10 secondes
+      setTimeout(stop, 10000);
+    })();
+  </script>
 
   <!-- d3js -->
   <script type="text/javascript">
